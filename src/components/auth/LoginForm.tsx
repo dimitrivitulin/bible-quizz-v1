@@ -38,8 +38,9 @@ export default function LoginForm() {
     try {
       await loginWithGoogle()
       router.push('/niveaux')
-    } catch {
-      setServerError('Connexion Google échouée. Réessayez.')
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code ?? 'inconnu'
+      setServerError(`Erreur Google : ${code}`)
     } finally {
       setLoading(false)
     }
