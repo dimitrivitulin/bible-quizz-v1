@@ -1,5 +1,7 @@
 
 
+import type { Question } from '@/types'
+
 // Niveau 7 — Difficile | Prophètes, rois, détails précis | Référence : Louis Segond 1910
 const questions: Question[] = [
   { id: 'l7q01', level: 7, question: 'Quel prophète a annoncé la destruction de Ninive ?', options: ['Amos', 'Joël', 'Nahoum', 'Abdias'], correctIndex: 2, reference: 'Nahoum 1:1' },
