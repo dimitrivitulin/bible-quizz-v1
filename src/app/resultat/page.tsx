@@ -107,15 +107,30 @@ function ResultatContent() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="bg-amber-900/20 border border-amber-700/40 rounded-2xl p-4 mb-5"
+          className="mb-5 space-y-3"
         >
-          <p className="text-amber-300 font-bold mb-2">Trophées débloqués !</p>
-          {result.newTrophies.map((id) => {
+          <p className="text-amber-300 font-bold text-lg text-center">
+            🎉 Nouveau trophée débloqué !
+          </p>
+          {result.newTrophies.map((id, idx) => {
             const t = TROPHIES.find((t) => t.id === id)
             return t ? (
-              <div key={id} className="flex items-center gap-2 text-sm text-amber-100">
-                <span>{t.icon}</span><span>{t.name}</span>
-              </div>
+              <motion.div
+                key={id}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6 + idx * 0.15 }}
+                className="bg-gradient-to-br from-amber-900/40 to-stone-800/60 border border-amber-600/50 rounded-2xl p-4 text-center"
+              >
+                <div className="text-4xl mb-2">{t.icon}</div>
+                <p className="text-amber-200 font-bold text-base mb-1">{t.name}</p>
+                <p className="text-stone-300 text-sm italic leading-relaxed">{t.description}</p>
+                <div className="mt-3 pt-3 border-t border-amber-800/30">
+                  <p className="text-stone-500 text-xs">
+                    Ce trophée représente une étape dans ta croissance spirituelle — continue de grandir dans la Parole.
+                  </p>
+                </div>
+              </motion.div>
             ) : null
           })}
         </motion.div>

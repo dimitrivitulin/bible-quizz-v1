@@ -35,6 +35,19 @@ export default function NiveauxPage() {
     return (prevBest / prevMax) * 100 >= prev.minScoreToUnlock
   }
 
+  // Niveau courant = premier niveau non-complété et débloqué
+  const currentLevelId = (() => {
+    for (const level of LEVELS) {
+      if (isUnlocked(level.id) && !(profile?.levelsCompleted?.includes(level.id) ?? false)) {
+        return level.id
+      }
+    }
+    return LEVELS[LEVELS.length - 1].id // tous complétés → dernier niveau
+  })()
+
+  // Niveaux visibles = complétés + courant (on cache les suivants)
+  const visibleLevels = LEVELS.filter((l) => l.id <= currentLevelId)
+
   if (loading || !user) return null
 
   return (
@@ -44,14 +57,11 @@ export default function NiveauxPage() {
         <div className="flex items-center justify-between mb-2">
           <div>
             <h1 className="text-2xl font-bold text-amber-100">Bonjour, {user.displayName?.split(' ')[0] ?? 'Disciple'} 👋</h1>
-            <p className="text-stone-400 text-sm">Choisis ton niveau</p>
+            <p className="text-stone-400 text-sm">Ton parcours dans la Parole</p>
           </div>
           <div className="flex gap-2">
             <Link href="/trophees">
               <Button variant="ghost" size="sm">🏆</Button>
-            </Link>
-            <Link href="/profil">
-              <Button variant="ghost" size="sm">👤</Button>
             </Link>
           </div>
         </div>
@@ -67,21 +77,22 @@ export default function NiveauxPage() {
               <p className="text-amber-100 font-bold">{profile.gamesPlayed}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-stone-400">Niveaux complétés</p>
+              <p className="text-xs text-stone-400">Complétés</p>
               <p className="text-amber-100 font-bold">{profile.levelsCompleted?.length ?? 0} / 10</p>
             </div>
           </div>
         )}
       </motion.div>
 
-      {/* Grille des niveaux */}
+      {/* Liste des niveaux — découverte progressive */}
       <div className="max-w-lg mx-auto grid grid-cols-1 gap-3">
-        {LEVELS.map((level, i) => (
+        {visibleLevels.map((level, i) => (
           <LevelCard
             key={level.id}
             level={level}
             isUnlocked={isUnlocked(level.id)}
             isCompleted={profile?.levelsCompleted?.includes(level.id) ?? false}
+            isCurrent={level.id === currentLevelId}
             bestScore={profile?.bestScores?.[level.id]}
             index={i}
           />

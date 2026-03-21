@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore } from '@/store/gameStore'
 import { getLevelById } from '@/data/levels'
 import Timer from './Timer'
@@ -14,14 +14,26 @@ interface GameScreenProps {
   levelId: number
 }
 
+const ENCOURAGEMENTS = [
+  'Continue, tu es sur la bonne voie ! ✝️',
+  'Chaque question est une graine semée. 🌱',
+  'La Parole éclaire tes pas. 🕊️',
+  'Ne te lasse pas de bien faire. ⚒️',
+  'Tu grandis dans la connaissance ! 📖',
+  'Persévère — la couronne t\'attend. 🌟',
+]
+
 export default function GameScreen({ levelId }: GameScreenProps) {
   const router = useRouter()
   const { session, lastPointsGained, startGame, answerQuestion, nextQuestion } = useGameStore()
   const level = getLevelById(levelId)
 
-  // État local pour l'affichage de la réponse — reset à chaque question
   const [selected, setSelected] = useState<number | null>(null)
   const [revealed, setRevealed] = useState(false)
+  const [shake, setShake] = useState(false)
+  const [encouragement, setEncouragement] = useState<string | null>(null)
+  const [prevLives, setPrevLives] = useState<number | null>(null)
+  const [showWin, setShowWin] = useState(false)
 
   useEffect(() => {
     startGame(levelId)
@@ -31,11 +43,37 @@ export default function GameScreen({ levelId }: GameScreenProps) {
   useEffect(() => {
     setSelected(null)
     setRevealed(false)
+    setShake(false)
   }, [session?.currentIndex])
 
+  // Détecter perte de vie pour déclencher le shake
   useEffect(() => {
-    if (session?.status === 'completed' || session?.status === 'lost') {
-      const timeout = setTimeout(() => router.push(`/resultat?level=${levelId}`), 1500)
+    if (session === null) return
+    if (prevLives !== null && session.lives < prevLives) {
+      setShake(true)
+      setTimeout(() => setShake(false), 600)
+    }
+    setPrevLives(session.lives)
+  }, [session?.lives]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Encouragements après chaque question correcte (toutes les 3 questions)
+  useEffect(() => {
+    if (!session || session.currentIndex === 0) return
+    if (session.currentIndex % 3 === 0) {
+      const msg = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)]
+      setEncouragement(msg)
+      setTimeout(() => setEncouragement(null), 2200)
+    }
+  }, [session?.currentIndex]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (session?.status === 'completed') {
+      setShowWin(true)
+      const timeout = setTimeout(() => router.push(`/resultat?level=${levelId}`), 2500)
+      return () => clearTimeout(timeout)
+    }
+    if (session?.status === 'lost') {
+      const timeout = setTimeout(() => router.push(`/resultat?level=${levelId}`), 2500)
       return () => clearTimeout(timeout)
     }
   }, [session?.status, levelId, router])
@@ -48,9 +86,7 @@ export default function GameScreen({ levelId }: GameScreenProps) {
     if (revealed || session.status !== 'playing') return
     setSelected(chosenIndex)
     setRevealed(true)
-    // Enregistre la réponse dans le store
     answerQuestion(chosenIndex)
-    // Passe à la question suivante après 1.5s
     setTimeout(() => nextQuestion(), 1500)
   }
 
@@ -63,7 +99,11 @@ export default function GameScreen({ levelId }: GameScreenProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-900 via-stone-800 to-stone-900 flex flex-col items-center justify-start px-4 py-6">
+    <motion.div
+      animate={shake ? { x: [-8, 8, -6, 6, -4, 4, 0] } : { x: 0 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-gradient-to-b from-stone-900 via-stone-800 to-stone-900 flex flex-col items-center justify-start px-4 py-6"
+    >
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -89,32 +129,95 @@ export default function GameScreen({ levelId }: GameScreenProps) {
       </motion.div>
 
       {/* Question */}
-      <div className="w-full max-w-lg">
-        <QuestionCard
-          key={session.currentIndex}
-          question={currentQ}
-          questionNumber={session.currentIndex + 1}
-          totalQuestions={session.questions.length}
-          selected={selected}
-          revealed={revealed}
-          onSelect={handleSelect}
-        />
-      </div>
-
-      {/* Overlay game over */}
-      {session.status === 'lost' && (
+      <AnimatePresence mode="wait">
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+          key={session.currentIndex}
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.25 }}
+          className="w-full max-w-lg"
         >
-          <div className="text-center">
-            <p className="text-5xl mb-3">🕊️</p>
-            <p className="text-amber-100 text-2xl font-bold">Le chemin continue...</p>
-            <p className="text-amber-400 text-sm mt-1">Tu peux réessayer à tout moment</p>
-          </div>
+          <QuestionCard
+            question={currentQ}
+            questionNumber={session.currentIndex + 1}
+            totalQuestions={session.questions.length}
+            selected={selected}
+            revealed={revealed}
+            onSelect={handleSelect}
+          />
         </motion.div>
-      )}
-    </div>
+      </AnimatePresence>
+
+      {/* Encouragement toast */}
+      <AnimatePresence>
+        {encouragement && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-stone-800 border border-amber-700/40 rounded-full px-5 py-2 text-amber-200 text-sm shadow-lg"
+          >
+            {encouragement}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Overlay victoire */}
+      <AnimatePresence>
+        {showWin && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-amber-900/30 backdrop-blur-sm flex flex-col items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: [1.2, 1], opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 200 }}
+              className="text-center"
+            >
+              <motion.p
+                animate={{ rotate: [0, -10, 10, -5, 5, 0] }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-7xl mb-4"
+              >
+                🌟
+              </motion.p>
+              <p className="text-amber-100 text-3xl font-bold">Niveau accompli !</p>
+              <p className="text-amber-300 text-base mt-2">Tu as grandi dans la Parole.</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Overlay défaite */}
+      <AnimatePresence>
+        {session.status === 'lost' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 bg-red-950/60 backdrop-blur-sm flex flex-col items-center justify-center z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 180 }}
+              className="text-center"
+            >
+              <motion.p
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 0.5, repeat: 1 }}
+                className="text-6xl mb-4"
+              >
+                🕊️
+              </motion.p>
+              <p className="text-red-200 text-2xl font-bold">Le chemin continue...</p>
+              <p className="text-red-300/70 text-sm mt-2">Ne te décourage pas — chaque chute est une leçon.</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   )
 }
