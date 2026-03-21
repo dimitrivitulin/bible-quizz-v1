@@ -16,8 +16,8 @@ export function proxy(request: NextRequest) {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https://lh3.googleusercontent.com",
-      "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com",
-      "frame-src https://accounts.google.com",
+      "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com",
+      "frame-src https://accounts.google.com https://bible-quizz1.firebaseapp.com",
     ].join('; ')
   )
 
