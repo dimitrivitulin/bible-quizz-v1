@@ -110,7 +110,7 @@ function ResultatContent() {
           className="mb-5 space-y-3"
         >
           <p className="text-amber-300 font-bold text-lg text-center">
-            🎉 Nouveau trophée débloqué !
+            🎉 {result.newTrophies.length > 1 ? 'Nouveaux trophées débloqués !' : 'Nouveau trophée débloqué !'}
           </p>
           {result.newTrophies.map((id, idx) => {
             const t = TROPHIES.find((t) => t.id === id)
@@ -119,17 +119,19 @@ function ResultatContent() {
                 key={id}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.6 + idx * 0.15 }}
-                className="bg-gradient-to-br from-amber-900/40 to-stone-800/60 border border-amber-600/50 rounded-2xl p-4 text-center"
+                transition={{ delay: 0.6 + idx * 0.15, type: 'spring', stiffness: 200 }}
+                className="bg-gradient-to-br from-amber-900/40 to-stone-800/60 border border-amber-500/60 rounded-2xl p-5 text-center"
               >
-                <div className="text-4xl mb-2">{t.icon}</div>
-                <p className="text-amber-200 font-bold text-base mb-1">{t.name}</p>
-                <p className="text-stone-300 text-sm italic leading-relaxed">{t.description}</p>
-                <div className="mt-3 pt-3 border-t border-amber-800/30">
-                  <p className="text-stone-500 text-xs">
-                    Ce trophée représente une étape dans ta croissance spirituelle — continue de grandir dans la Parole.
-                  </p>
-                </div>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.7 + idx * 0.15, type: 'spring', stiffness: 300 }}
+                  className="text-5xl mb-3"
+                >
+                  {t.icon}
+                </motion.div>
+                <p className="text-amber-200 font-bold text-lg mb-3">{t.name}</p>
+                <p className="text-stone-300 text-sm leading-relaxed">{t.description}</p>
               </motion.div>
             ) : null
           })}
