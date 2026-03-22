@@ -10,6 +10,7 @@ interface QuestionCardProps {
   totalQuestions: number
   selected: number | null
   revealed: boolean
+  isCorrect: boolean | null
   onSelect: (index: number) => void
 }
 
@@ -21,6 +22,7 @@ export default function QuestionCard({
   totalQuestions,
   selected,
   revealed,
+  isCorrect,
   onSelect,
 }: QuestionCardProps) {
   const getOptionClass = (i: number) => {
@@ -30,12 +32,18 @@ export default function QuestionCard({
     return 'bg-stone-700/30 border-stone-600 opacity-50'
   }
 
+  const revealAnimation = revealed
+    ? isCorrect
+      ? { scale: [1, 1.03, 1] }
+      : { x: [0, -8, 8, -6, 6, -3, 3, 0] }
+    : {}
+
   return (
     <motion.div
       key={question.id}
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
+      animate={{ opacity: 1, y: 0, ...revealAnimation }}
+      transition={{ duration: revealed ? 0.4 : 0.25 }}
       className="w-full"
     >
       <p className="text-xs text-amber-400/70 mb-3 text-right">

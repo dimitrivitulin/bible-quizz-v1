@@ -14,13 +14,19 @@ interface GameScreenProps {
   levelId: number
 }
 
-const ENCOURAGEMENTS = [
-  'Continue, tu es sur la bonne voie ! ✝️',
-  'Chaque question est une graine semée. 🌱',
-  'La Parole éclaire tes pas. 🕊️',
-  'Ne te lasse pas de bien faire. ⚒️',
-  'Tu grandis dans la connaissance ! 📖',
-  'Persévère — la couronne t\'attend. 🌟',
+const CORRECT_MESSAGES = [
+  'La Parole est en toi.',
+  'Bien vu.',
+  'Tu connais les Écritures.',
+  'Solide.',
+  'Fidèle à la Parole.',
+]
+
+const WRONG_MESSAGES = [
+  'Même les apôtres ont raté.',
+  'Pierre aussi a renié trois fois.',
+  'Même Moïse a douté.',
+  'Jonas a fui. Tu peux rater.',
 ]
 
 export default function GameScreen({ levelId }: GameScreenProps) {
@@ -30,6 +36,7 @@ export default function GameScreen({ levelId }: GameScreenProps) {
 
   const [selected, setSelected] = useState<number | null>(null)
   const [revealed, setRevealed] = useState(false)
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [shake, setShake] = useState(false)
   const [encouragement, setEncouragement] = useState<string | null>(null)
   const [prevLives, setPrevLives] = useState<number | null>(null)
@@ -43,6 +50,7 @@ export default function GameScreen({ levelId }: GameScreenProps) {
   useEffect(() => {
     setSelected(null)
     setRevealed(false)
+    setIsCorrect(null)
     setShake(false)
   }, [session?.currentIndex])
 
@@ -56,15 +64,6 @@ export default function GameScreen({ levelId }: GameScreenProps) {
     setPrevLives(session.lives)
   }, [session?.lives]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Encouragements après chaque question correcte (toutes les 3 questions)
-  useEffect(() => {
-    if (!session || session.currentIndex === 0) return
-    if (session.currentIndex % 3 === 0) {
-      const msg = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)]
-      setEncouragement(msg)
-      setTimeout(() => setEncouragement(null), 2200)
-    }
-  }, [session?.currentIndex]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (session?.status === 'completed') {
@@ -82,11 +81,21 @@ export default function GameScreen({ levelId }: GameScreenProps) {
 
   const currentQ = session.questions[session.currentIndex]
 
+  const showEncouragement = (correct: boolean) => {
+    const pool = correct ? CORRECT_MESSAGES : WRONG_MESSAGES
+    const msg = pool[Math.floor(Math.random() * pool.length)]
+    setEncouragement(msg)
+    setTimeout(() => setEncouragement(null), 2000)
+  }
+
   const handleSelect = (chosenIndex: number) => {
     if (revealed || session.status !== 'playing') return
+    const correct = chosenIndex === currentQ.correctIndex
     setSelected(chosenIndex)
     setRevealed(true)
+    setIsCorrect(correct)
     answerQuestion(chosenIndex)
+    showEncouragement(correct)
     setTimeout(() => nextQuestion(), 1500)
   }
 
@@ -94,7 +103,9 @@ export default function GameScreen({ levelId }: GameScreenProps) {
     if (revealed || session.status !== 'playing') return
     setSelected(null)
     setRevealed(true)
+    setIsCorrect(false)
     answerQuestion(-1)
+    showEncouragement(false)
     setTimeout(() => nextQuestion(), 1500)
   }
 
@@ -144,6 +155,7 @@ export default function GameScreen({ levelId }: GameScreenProps) {
             totalQuestions={session.questions.length}
             selected={selected}
             revealed={revealed}
+            isCorrect={isCorrect}
             onSelect={handleSelect}
           />
         </motion.div>
@@ -213,7 +225,7 @@ export default function GameScreen({ levelId }: GameScreenProps) {
                 🕊️
               </motion.p>
               <p className="text-red-200 text-2xl font-bold">Le chemin continue...</p>
-              <p className="text-red-300/70 text-sm mt-2">Ne te décourage pas — chaque chute est une leçon.</p>
+              <p className="text-red-300/70 text-sm mt-2">Même les apôtres ont raté.</p>
             </motion.div>
           </motion.div>
         )}
