@@ -28,17 +28,17 @@ export default function Timer({ duration, onExpire, running }: TimerProps) {
   }, [timeLeft, running])
 
   const pct = (timeLeft / duration) * 100
-  const color = pct > 50 ? 'bg-emerald-500' : pct > 25 ? 'bg-amber-500' : 'bg-red-500'
+  const color = pct > 50 ? 'bg-[#4A6741]' : pct > 25 ? 'bg-[#A0762A]' : 'bg-[#7A2232]'
 
   return (
     <div className="w-full" role="timer" aria-label={`Temps restant : ${timeLeft} secondes`}>
       <div className="flex justify-between items-center mb-1">
-        <span className="text-xs text-amber-300 font-medium">Temps</span>
-        <span className={`text-lg font-bold tabular-nums ${timeLeft <= 5 ? 'text-red-400 animate-pulse' : 'text-amber-100'}`}>
+        <span className="text-xs text-sepia-subtle font-medium">Temps</span>
+        <span className={`text-lg font-bold tabular-nums ${timeLeft <= 5 ? 'text-[#7A2232] animate-pulse' : 'text-sepia'}`}>
           {timeLeft}s
         </span>
       </div>
-      <div className="h-2 bg-stone-700 rounded-full overflow-hidden">
+      <div className="h-2 bg-parchment-muted rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all duration-1000 ${color}`}
           style={{ width: `${pct}%` }}

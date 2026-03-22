@@ -20,7 +20,7 @@ export default function StreakIndicator({ streak, lastPointsGained }: StreakIndi
             initial={{ scale: 1.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 300 }}
-            className={`text-xl font-bold tabular-nums ${isBonus ? 'text-orange-400' : 'text-stone-400'}`}
+            className={`text-xl font-bold tabular-nums ${isBonus ? 'text-[#A0762A]' : 'text-sepia-subtle'}`}
           >
             {streak > 0 ? `${streak}` : '0'}
           </motion.span>
@@ -52,7 +52,7 @@ export default function StreakIndicator({ streak, lastPointsGained }: StreakIndi
             initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.9 }}
-            className={`text-sm font-bold ${lastPointsGained > 10 ? 'text-orange-300' : 'text-emerald-400'}`}
+            className={`text-sm font-bold ${lastPointsGained > 10 ? 'text-gold' : 'text-[#4A6741]'}`}
           >
             +{lastPointsGained}
           </motion.span>

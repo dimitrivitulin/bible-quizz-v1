@@ -38,7 +38,7 @@ function ResultatContent() {
   if (!session || !result) {
     return (
       <div className="text-center">
-        <p className="text-amber-100 mb-4">Aucune partie en cours.</p>
+        <p className="text-sepia mb-4">Aucune partie en cours.</p>
         <Link href="/niveaux"><Button>Choisir un niveau</Button></Link>
       </div>
     )
@@ -63,43 +63,43 @@ function ResultatContent() {
   return (
     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-sm w-full">
       <div className="text-6xl mb-4">{emoji}</div>
-      <h1 className="text-2xl font-bold text-amber-100 mb-1">
+      <h1 className="font-serif text-2xl text-sepia mb-1">
         {session.status === 'completed' ? 'Niveau terminé !' : 'Partie terminée'}
       </h1>
-      <p className="text-stone-400 text-sm mb-6 italic">{message}</p>
+      <p className="text-sepia-muted text-sm mb-6 italic">{message}</p>
 
-      <div className="bg-stone-800/70 border border-amber-700/20 rounded-2xl p-5 mb-5 space-y-3">
+      <div className="bg-parchment-card border border-gold-subtle rounded-2xl p-5 mb-5 space-y-3">
         <div className="flex justify-between items-center">
-          <span className="text-stone-400 text-sm">Score</span>
-          <span className="text-amber-300 font-bold text-xl">{result.score} / {result.maxScore} pts</span>
+          <span className="text-sepia-subtle text-sm">Score</span>
+          <span className="text-gold font-bold text-xl">{result.score} / {result.maxScore} pts</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-stone-400 text-sm">Bonnes réponses</span>
-          <span className="text-amber-100 font-medium">{result.correctAnswers} / {result.totalQuestions}</span>
+          <span className="text-sepia-subtle text-sm">Bonnes réponses</span>
+          <span className="text-sepia font-medium">{result.correctAnswers} / {result.totalQuestions}</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-stone-400 text-sm">Vies restantes</span>
-          <span className="text-amber-100">{result.livesRemaining} × 🕊️</span>
+          <span className="text-sepia-subtle text-sm">Vies restantes</span>
+          <span className="text-sepia">{result.livesRemaining} × 🕊️</span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-stone-400 text-sm">Durée</span>
-          <span className="text-amber-100">{result.durationSeconds}s</span>
+          <span className="text-sepia-subtle text-sm">Durée</span>
+          <span className="text-sepia">{result.durationSeconds}s</span>
         </div>
         {session.maxStreak >= 3 && (
           <div className="flex justify-between items-center">
-            <span className="text-stone-400 text-sm">Meilleur streak</span>
-            <span className="text-orange-400 font-bold">{session.maxStreak} 🔥</span>
+            <span className="text-sepia-subtle text-sm">Meilleur streak</span>
+            <span className="text-gold font-bold">{session.maxStreak} 🔥</span>
           </div>
         )}
-        <div className="h-2 bg-stone-700 rounded-full overflow-hidden mt-2">
+        <div className="h-2 bg-parchment-muted rounded-full overflow-hidden mt-2">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="h-full bg-gradient-to-r from-amber-500 to-amber-300 rounded-full"
+            className="h-full bg-gradient-to-r from-[#A0762A] to-[#C9A96E] rounded-full"
           />
         </div>
-        <p className="text-xs text-stone-500">{pct}% de réussite</p>
+        <p className="text-xs text-sepia-subtle">{pct}% de réussite</p>
       </div>
 
       {result.newTrophies.length > 0 && (
@@ -109,7 +109,7 @@ function ResultatContent() {
           transition={{ delay: 0.5 }}
           className="mb-5 space-y-3"
         >
-          <p className="text-amber-300 font-bold text-lg text-center">
+          <p className="text-gold font-bold text-lg text-center font-serif">
             🎉 {result.newTrophies.length > 1 ? 'Nouveaux trophées débloqués !' : 'Nouveau trophée débloqué !'}
           </p>
           {result.newTrophies.map((id, idx) => {
@@ -120,7 +120,7 @@ function ResultatContent() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.6 + idx * 0.15, type: 'spring', stiffness: 200 }}
-                className="bg-gradient-to-br from-amber-900/40 to-stone-800/60 border border-amber-500/60 rounded-2xl p-5 text-center"
+                className="bg-parchment-card border-2 border-[#A0762A] rounded-2xl p-5 text-center"
               >
                 <motion.div
                   initial={{ scale: 0 }}
@@ -130,8 +130,8 @@ function ResultatContent() {
                 >
                   {t.icon}
                 </motion.div>
-                <p className="text-amber-200 font-bold text-lg mb-3">{t.name}</p>
-                <p className="text-stone-300 text-sm leading-relaxed">{t.description}</p>
+                <p className="text-sepia font-bold font-serif text-lg mb-2">{t.name}</p>
+                <p className="text-sepia-muted text-sm leading-relaxed italic">{t.description}</p>
               </motion.div>
             ) : null
           })}
@@ -152,11 +152,11 @@ function ResultatContent() {
 
 export default function ResultatPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-stone-900 to-stone-800 flex flex-col items-center justify-center px-4 py-10 text-center">
+    <main className="min-h-screen bg-parchment flex flex-col items-center justify-center px-4 py-10 text-center">
       <Suspense fallback={
-        <div className="flex items-center gap-2 text-amber-400">
-          <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-          Chargement...
+        <div className="flex items-center gap-2 text-gold">
+          <div className="w-5 h-5 border-2 border-[#A0762A] border-t-transparent rounded-full animate-spin" />
+          <span className="text-sepia-muted text-sm">Chargement...</span>
         </div>
       }>
         <ResultatContent />

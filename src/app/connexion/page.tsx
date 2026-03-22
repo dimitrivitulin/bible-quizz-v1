@@ -5,10 +5,9 @@ export const metadata = { title: 'Connexion — Bible Quizz' }
 
 export default function ConnexionPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-stone-900 to-stone-800 flex items-center justify-center px-4 py-12">
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-72 h-72 bg-amber-600/8 rounded-full blur-3xl pointer-events-none" />
-      <div className="relative z-10 w-full max-w-sm">
-        <p className="text-center text-3xl mb-6">📖</p>
+    <main className="min-h-screen bg-parchment flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-sm">
+        <p className="text-center text-4xl mb-6">📖</p>
         <LoginForm />
       </div>
     </main>

@@ -26,10 +26,10 @@ export default function QuestionCard({
   onSelect,
 }: QuestionCardProps) {
   const getOptionClass = (i: number) => {
-    if (!revealed) return 'bg-stone-700/60 hover:bg-amber-600/30 hover:border-amber-500 border-stone-600 cursor-pointer'
-    if (i === question.correctIndex) return 'bg-emerald-600/40 border-emerald-500 text-emerald-200'
-    if (i === selected && i !== question.correctIndex) return 'bg-red-700/40 border-red-500 text-red-200'
-    return 'bg-stone-700/30 border-stone-600 opacity-50'
+    if (!revealed) return 'bg-parchment border-gold-subtle hover:border-[#A0762A] hover:bg-parchment-card cursor-pointer'
+    if (i === question.correctIndex) return 'bg-[#E8F0E6] border-[#4A6741] text-[#4A6741]'
+    if (i === selected && i !== question.correctIndex) return 'bg-[#F5E6E8] border-[#7A2232] text-[#7A2232]'
+    return 'bg-parchment-muted border-gold-subtle opacity-40'
   }
 
   const revealAnimation = revealed
@@ -46,12 +46,12 @@ export default function QuestionCard({
       transition={{ duration: revealed ? 0.4 : 0.25 }}
       className="w-full"
     >
-      <p className="text-xs text-amber-400/70 mb-3 text-right">
+      <p className="text-xs text-sepia-subtle mb-3 text-right font-medium">
         Question {questionNumber} / {totalQuestions}
       </p>
 
-      <div className="bg-stone-800/70 border border-amber-700/20 rounded-2xl p-5 mb-5 min-h-[80px] flex items-center">
-        <p className="text-amber-50 text-lg font-medium leading-snug">{question.question}</p>
+      <div className="bg-parchment-card border border-gold-subtle rounded-2xl p-5 mb-5 min-h-[80px] flex items-center">
+        <p className="font-serif text-lg text-sepia leading-snug">{question.question}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-3">
@@ -61,14 +61,14 @@ export default function QuestionCard({
             onClick={() => !revealed && onSelect(i)}
             disabled={revealed}
             className={cn(
-              'flex items-center gap-3 w-full text-left rounded-xl border px-4 py-3 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400',
+              'flex items-center gap-3 w-full text-left rounded-xl border px-4 py-3 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A0762A]',
               getOptionClass(i)
             )}
           >
-            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-amber-700/30 flex items-center justify-center text-amber-300 text-sm font-bold">
+            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-parchment-muted border border-gold-subtle flex items-center justify-center text-gold text-sm font-bold">
               {OPTION_LABELS[i]}
             </span>
-            <span className="text-amber-100 text-sm leading-snug">{opt}</span>
+            <span className="text-sepia text-sm leading-snug">{opt}</span>
           </button>
         ))}
       </div>
@@ -77,7 +77,7 @@ export default function QuestionCard({
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mt-3 text-xs text-center text-amber-400/60 italic"
+          className="mt-3 text-xs text-center text-sepia-subtle font-serif italic"
         >
           📖 {question.reference}
         </motion.p>

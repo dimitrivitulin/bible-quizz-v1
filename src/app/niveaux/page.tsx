@@ -21,9 +21,7 @@ export default function NiveauxPage() {
   }, [user, loading, router])
 
   useEffect(() => {
-    if (user) {
-      getUserProfile(user.uid).then(setProfile)
-    }
+    if (user) getUserProfile(user.uid).then(setProfile)
   }, [user])
 
   const isUnlocked = (levelId: number): boolean => {
@@ -35,56 +33,50 @@ export default function NiveauxPage() {
     return (prevBest / prevMax) * 100 >= prev.minScoreToUnlock
   }
 
-  // Niveau courant = premier niveau non-complété et débloqué
   const currentLevelId = (() => {
     for (const level of LEVELS) {
       if (isUnlocked(level.id) && !(profile?.levelsCompleted?.includes(level.id) ?? false)) {
         return level.id
       }
     }
-    return LEVELS[LEVELS.length - 1].id // tous complétés → dernier niveau
+    return LEVELS[LEVELS.length - 1].id
   })()
 
-  // Niveaux visibles = complétés + courant (on cache les suivants)
   const visibleLevels = LEVELS.filter((l) => l.id <= currentLevelId)
 
   if (loading || !user) return null
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-stone-900 to-stone-800 px-4 py-8">
-      {/* Header */}
+    <main className="min-h-screen bg-parchment px-4 py-8">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="max-w-lg mx-auto mb-8">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h1 className="text-2xl font-bold text-amber-100">Bonjour, {user.displayName?.split(' ')[0] ?? 'Disciple'} 👋</h1>
-            <p className="text-stone-400 text-sm">Ton parcours dans la Parole</p>
+            <h1 className="font-serif text-2xl text-sepia">Bonjour, {user.displayName?.split(' ')[0] ?? 'Disciple'}</h1>
+            <p className="text-sepia-subtle text-sm italic">Ton parcours dans la Parole</p>
           </div>
-          <div className="flex gap-2">
-            <Link href="/trophees">
-              <Button variant="ghost" size="sm">🏆</Button>
-            </Link>
-          </div>
+          <Link href="/trophees">
+            <Button variant="outline" size="sm" className="border-gold-subtle text-sepia hover:bg-parchment-card">🏆</Button>
+          </Link>
         </div>
 
         {profile && (
-          <div className="bg-stone-800/60 border border-amber-700/20 rounded-2xl px-4 py-3 flex items-center justify-between">
+          <div className="bg-parchment-card border border-gold-subtle rounded-2xl px-4 py-3 flex items-center justify-between mt-3">
             <div>
-              <p className="text-xs text-stone-400">Score total</p>
-              <p className="text-amber-300 font-bold text-lg">{profile.totalScore} pts</p>
+              <p className="text-xs text-sepia-subtle">Score total</p>
+              <p className="text-gold font-bold text-lg">{profile.totalScore} pts</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-stone-400">Parties</p>
-              <p className="text-amber-100 font-bold">{profile.gamesPlayed}</p>
+              <p className="text-xs text-sepia-subtle">Parties</p>
+              <p className="text-sepia font-bold">{profile.gamesPlayed}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-stone-400">Complétés</p>
-              <p className="text-amber-100 font-bold">{profile.levelsCompleted?.length ?? 0} / 10</p>
+              <p className="text-xs text-sepia-subtle">Complétés</p>
+              <p className="text-sepia font-bold">{profile.levelsCompleted?.length ?? 0} / 10</p>
             </div>
           </div>
         )}
       </motion.div>
 
-      {/* Liste des niveaux — découverte progressive */}
       <div className="max-w-lg mx-auto grid grid-cols-1 gap-3">
         {visibleLevels.map((level, i) => (
           <LevelCard
@@ -99,9 +91,8 @@ export default function NiveauxPage() {
         ))}
       </div>
 
-      {/* Bouton déconnexion */}
       <div className="max-w-lg mx-auto mt-8 text-center">
-        <Button variant="ghost" size="sm" onClick={() => { logout(); router.push('/') }}>
+        <Button variant="ghost" size="sm" className="text-sepia-subtle hover:text-sepia" onClick={() => { logout(); router.push('/') }}>
           Se déconnecter
         </Button>
       </div>

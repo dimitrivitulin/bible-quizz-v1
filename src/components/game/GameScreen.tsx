@@ -42,11 +42,8 @@ export default function GameScreen({ levelId }: GameScreenProps) {
   const [prevLives, setPrevLives] = useState<number | null>(null)
   const [showWin, setShowWin] = useState(false)
 
-  useEffect(() => {
-    startGame(levelId)
-  }, [levelId]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { startGame(levelId) }, [levelId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reset visuel à chaque changement de question
   useEffect(() => {
     setSelected(null)
     setRevealed(false)
@@ -54,7 +51,6 @@ export default function GameScreen({ levelId }: GameScreenProps) {
     setShake(false)
   }, [session?.currentIndex])
 
-  // Détecter perte de vie pour déclencher le shake
   useEffect(() => {
     if (session === null) return
     if (prevLives !== null && session.lives < prevLives) {
@@ -63,7 +59,6 @@ export default function GameScreen({ levelId }: GameScreenProps) {
     }
     setPrevLives(session.lives)
   }, [session?.lives]) // eslint-disable-line react-hooks/exhaustive-deps
-
 
   useEffect(() => {
     if (session?.status === 'completed') {
@@ -113,18 +108,14 @@ export default function GameScreen({ levelId }: GameScreenProps) {
     <motion.div
       animate={shake ? { x: [-8, 8, -6, 6, -4, 4, 0] } : { x: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-gradient-to-b from-stone-900 via-stone-800 to-stone-900 flex flex-col items-center justify-start px-4 py-6"
+      className="min-h-screen bg-parchment flex flex-col items-center justify-start px-4 py-6"
     >
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg mb-6"
-      >
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-amber-400 text-xs font-medium uppercase tracking-wider">{level.name}</p>
-            <p className="text-amber-100 text-2xl font-bold">{session.score} pts</p>
+            <p className="text-gold text-xs font-medium uppercase tracking-wider">{level.name}</p>
+            <p className="font-serif text-2xl text-sepia">{session.score} pts</p>
           </div>
           <div className="flex flex-col items-end gap-1">
             <LivesBar lives={session.lives} maxLives={level.lives} />
@@ -168,7 +159,7 @@ export default function GameScreen({ levelId }: GameScreenProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-stone-800 border border-amber-700/40 rounded-full px-5 py-2 text-amber-200 text-sm shadow-lg"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-parchment-card border border-gold-subtle rounded-full px-5 py-2 text-sepia-muted text-sm shadow-md font-serif italic"
           >
             {encouragement}
           </motion.div>
@@ -181,23 +172,17 @@ export default function GameScreen({ levelId }: GameScreenProps) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-amber-900/30 backdrop-blur-sm flex flex-col items-center justify-center z-50"
+            className="fixed inset-0 bg-[#A0762A]/15 backdrop-blur-sm flex flex-col items-center justify-center z-50"
           >
             <motion.div
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: [1.2, 1], opacity: 1 }}
               transition={{ type: 'spring', stiffness: 200 }}
-              className="text-center"
+              className="text-center bg-parchment-card border-2 border-[#A0762A] rounded-3xl px-10 py-8"
             >
-              <motion.p
-                animate={{ rotate: [0, -10, 10, -5, 5, 0] }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-7xl mb-4"
-              >
-                🌟
-              </motion.p>
-              <p className="text-amber-100 text-3xl font-bold">Niveau accompli !</p>
-              <p className="text-amber-300 text-base mt-2">Tu as grandi dans la Parole.</p>
+              <motion.p animate={{ rotate: [0, -10, 10, -5, 5, 0] }} transition={{ duration: 0.6, delay: 0.2 }} className="text-6xl mb-4">🌟</motion.p>
+              <p className="font-serif text-sepia text-3xl">Niveau accompli !</p>
+              <p className="text-gold text-base mt-2 italic">Tu as grandi dans la Parole.</p>
             </motion.div>
           </motion.div>
         )}
@@ -209,23 +194,17 @@ export default function GameScreen({ levelId }: GameScreenProps) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-red-950/60 backdrop-blur-sm flex flex-col items-center justify-center z-50"
+            className="fixed inset-0 bg-[#7A2232]/15 backdrop-blur-sm flex flex-col items-center justify-center z-50"
           >
             <motion.div
               initial={{ scale: 0.7, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 180 }}
-              className="text-center"
+              className="text-center bg-parchment-card border-2 border-[#7A2232] rounded-3xl px-10 py-8"
             >
-              <motion.p
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 0.5, repeat: 1 }}
-                className="text-6xl mb-4"
-              >
-                🕊️
-              </motion.p>
-              <p className="text-red-200 text-2xl font-bold">Le chemin continue...</p>
-              <p className="text-red-300/70 text-sm mt-2">Même les apôtres ont raté.</p>
+              <motion.p animate={{ y: [0, -10, 0] }} transition={{ duration: 0.5, repeat: 1 }} className="text-5xl mb-4">🕊️</motion.p>
+              <p className="font-serif text-sepia text-2xl">Le chemin continue...</p>
+              <p className="text-sepia-muted text-sm mt-2 italic">Même les apôtres ont raté.</p>
             </motion.div>
           </motion.div>
         )}
