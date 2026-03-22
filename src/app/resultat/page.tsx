@@ -143,7 +143,7 @@ function ResultatContent() {
           Rejouer ce niveau
         </Button>
         <Link href="/niveaux" onClick={resetGame}>
-          <Button variant="secondary" size="md" className="w-full">Choisir un autre niveau</Button>
+          <Button variant="secondary" size="default" className="w-full">Choisir un autre niveau</Button>
         </Link>
       </div>
     </motion.div>

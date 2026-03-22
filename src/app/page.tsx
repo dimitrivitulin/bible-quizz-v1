@@ -46,7 +46,7 @@ export default function HomePage() {
         ) : (
           <div className="space-y-3">
             <Link href="/inscription"><Button size="lg" className="w-full">Commencer le parcours →</Button></Link>
-            <Link href="/connexion"><Button variant="ghost" size="md" className="w-full">J&apos;ai déjà un compte</Button></Link>
+            <Link href="/connexion"><Button variant="ghost" size="default" className="w-full">J&apos;ai déjà un compte</Button></Link>
           </div>
         )}
       </motion.div>
