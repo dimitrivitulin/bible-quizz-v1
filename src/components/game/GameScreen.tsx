@@ -4,14 +4,16 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore } from '@/store/gameStore'
-import { getLevelById } from '@/data/levels'
+import { getThemeById } from '@/data/themes'
 import Timer from './Timer'
 import LivesBar from './LivesBar'
 import QuestionCard from './QuestionCard'
 import StreakIndicator from './StreakIndicator'
+import type { Difficulty } from '@/types'
 
 interface GameScreenProps {
-  levelId: number
+  themeId: string
+  difficulty: Difficulty
 }
 
 const CORRECT_MESSAGES = [
@@ -29,10 +31,10 @@ const WRONG_MESSAGES = [
   'Jonas a fui. Tu peux rater.',
 ]
 
-export default function GameScreen({ levelId }: GameScreenProps) {
+export default function GameScreen({ themeId, difficulty }: GameScreenProps) {
   const router = useRouter()
   const { session, lastPointsGained, startGame, answerQuestion, nextQuestion } = useGameStore()
-  const level = getLevelById(levelId)
+  const theme = getThemeById(themeId)
 
   const [selected, setSelected] = useState<number | null>(null)
   const [revealed, setRevealed] = useState(false)
@@ -42,7 +44,7 @@ export default function GameScreen({ levelId }: GameScreenProps) {
   const [prevLives, setPrevLives] = useState<number | null>(null)
   const [showWin, setShowWin] = useState(false)
 
-  useEffect(() => { startGame(levelId) }, [levelId]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { startGame(themeId, difficulty) }, [themeId, difficulty]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setSelected(null)
@@ -63,18 +65,25 @@ export default function GameScreen({ levelId }: GameScreenProps) {
   useEffect(() => {
     if (session?.status === 'completed') {
       setShowWin(true)
-      const timeout = setTimeout(() => router.push(`/resultat?level=${levelId}`), 2500)
+      const timeout = setTimeout(() => router.push(`/resultat?theme=${themeId}&difficulte=${difficulty}`), 2500)
       return () => clearTimeout(timeout)
     }
     if (session?.status === 'lost') {
-      const timeout = setTimeout(() => router.push(`/resultat?level=${levelId}`), 2500)
+      const timeout = setTimeout(() => router.push(`/resultat?theme=${themeId}&difficulte=${difficulty}`), 2500)
       return () => clearTimeout(timeout)
     }
-  }, [session?.status, levelId, router])
+  }, [session?.status, themeId, difficulty, router])
 
-  if (!session || !level) return null
+  if (!session || !theme) return null
 
   const currentQ = session.questions[session.currentIndex]
+  const maxLives = theme.lives[difficulty]
+
+  const difficultyLabel: Record<Difficulty, string> = {
+    facile: 'Facile',
+    intermediaire: 'Intermédiaire',
+    difficile: 'Difficile',
+  }
 
   const showEncouragement = (correct: boolean) => {
     const pool = correct ? CORRECT_MESSAGES : WRONG_MESSAGES
@@ -114,11 +123,11 @@ export default function GameScreen({ levelId }: GameScreenProps) {
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="text-gold text-xs font-medium uppercase tracking-wider">{level.name}</p>
+            <p className="text-gold text-xs font-medium uppercase tracking-wider">{theme.name} · {difficultyLabel[difficulty]}</p>
             <p className="font-serif text-2xl text-sepia">{session.score} pts</p>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <LivesBar lives={session.lives} maxLives={level.lives} />
+            <LivesBar lives={session.lives} maxLives={maxLives} />
             <StreakIndicator streak={session.streak} lastPointsGained={lastPointsGained} />
           </div>
         </div>

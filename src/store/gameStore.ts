@@ -1,15 +1,16 @@
 import { create } from 'zustand'
-import type { GameSession, Question } from '@/types'
+import type { GameSession, Question, Difficulty } from '@/types'
 import { getRandomQuestions } from '@/data/questions'
-import { getLevelById } from '@/data/levels'
+import { getThemeById } from '@/data/themes'
 
-const STREAK_BONUS_THRESHOLD = 3 // streak à partir duquel le x2 s'active
+const STREAK_BONUS_THRESHOLD = 3
 const BASE_POINTS = 10
+const QUESTIONS_PER_SESSION = 10
 
 interface GameStore {
   session: GameSession | null
-  lastPointsGained: number // pour l'animation
-  startGame: (levelId: number) => void
+  lastPointsGained: number
+  startGame: (themeId: string, difficulty: Difficulty) => void
   answerQuestion: (chosenIndex: number) => void
   nextQuestion: () => void
   resetGame: () => void
@@ -19,17 +20,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
   session: null,
   lastPointsGained: 0,
 
-  startGame: (levelId: number) => {
-    const level = getLevelById(levelId)
-    if (!level) return
-    const questions: Question[] = getRandomQuestions(levelId, level.questionsPerSession)
+  startGame: (themeId: string, difficulty: Difficulty) => {
+    const theme = getThemeById(themeId)
+    if (!theme) return
+    const questions: Question[] = getRandomQuestions(themeId, difficulty, QUESTIONS_PER_SESSION)
     set({
       session: {
-        levelId,
+        themeId,
+        difficulty,
         questions,
         currentIndex: 0,
         score: 0,
-        lives: level.lives,
+        lives: theme.lives[difficulty],
         streak: 0,
         maxStreak: 0,
         answers: new Array(questions.length).fill(null),
@@ -49,11 +51,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const newAnswers = [...session.answers]
     newAnswers[session.currentIndex] = chosenIndex
 
-    // Calcul du streak
     const newStreak = isCorrect ? session.streak + 1 : 0
     const newMaxStreak = Math.max(session.maxStreak, newStreak)
 
-    // Points avec bonus x2 si streak >= seuil
     const multiplier = isCorrect && session.streak >= STREAK_BONUS_THRESHOLD ? 2 : 1
     const pointsGained = isCorrect ? BASE_POINTS * multiplier : 0
     const newScore = session.score + pointsGained

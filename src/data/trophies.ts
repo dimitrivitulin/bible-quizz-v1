@@ -1,4 +1,4 @@
-import type { Trophy } from '@/types'
+import type { Trophy, Difficulty } from '@/types'
 
 export const TROPHIES: Trophy[] = [
   {
@@ -6,32 +6,8 @@ export const TROPHIES: Trophy[] = [
     name: 'Le Petit Enfant',
     description: '« Si vous ne devenez pas comme les petits enfants… » (Mt 18:3) — Tu as accepté d\'apprendre sans orgueil. C\'est le premier pas, et le plus important dans l\'étude de la Parole.',
     icon: '🌱',
-    conditionType: 'complete_level',
+    conditionType: 'complete_theme',
     conditionValue: 1,
-  },
-  {
-    id: 'celui_qui_ecoute',
-    name: 'Celui qui écoute',
-    description: '« Prompt à écouter, lent à parler. » (Jc 1:19) — Tu lis la Parole avec attention. La sagesse grandit en silence, avant de parler.',
-    icon: '👂',
-    conditionType: 'complete_level',
-    conditionValue: 2,
-  },
-  {
-    id: 'serviteur',
-    name: 'Serviteur',
-    description: '« Quiconque veut être le premier sera le serviteur de tous. » (Mc 10:44) — Tu avances sans chercher la gloire. Celui qui sert fidèlement est grand dans le Royaume.',
-    icon: '🙏',
-    conditionType: 'complete_level',
-    conditionValue: 3,
-  },
-  {
-    id: 'temoin',
-    name: 'Témoin',
-    description: '« Vous serez mes témoins. » (Ac 1:8) — Tu connais assez pour partager. La Parole reçue devient témoignage vivant dans ta bouche.',
-    icon: '🕊️',
-    conditionType: 'complete_level',
-    conditionValue: 5,
   },
   {
     id: 'berger_fidele',
@@ -40,14 +16,6 @@ export const TROPHIES: Trophy[] = [
     icon: '🦌',
     conditionType: 'no_lives_lost',
     conditionValue: 1,
-  },
-  {
-    id: 'disciple',
-    name: 'Disciple',
-    description: '« Si vous demeurez dans ma parole, vous êtes vraiment mes disciples. » (Jn 8:31) — Tu n\'es plus apprenti — tu marches dans la Parole avec constance.',
-    icon: '✝️',
-    conditionType: 'complete_level',
-    conditionValue: 7,
   },
   {
     id: 'gardien_parole',
@@ -66,27 +34,44 @@ export const TROPHIES: Trophy[] = [
     conditionValue: 10,
   },
   {
+    id: 'temoin',
+    name: 'Témoin',
+    description: '« Vous serez mes témoins. » (Ac 1:8) — Tu as complété un thème en difficulté intermédiaire. La Parole reçue devient témoignage vivant dans ta bouche.',
+    icon: '🕊️',
+    conditionType: 'complete_difficulty',
+    conditionValue: 'intermediaire',
+  },
+  {
     id: 'apotre',
     name: 'Apôtre',
-    description: '« Comment prêcheront-ils, s\'ils ne sont pas envoyés ? » (Rm 10:14) — Tu portes une connaissance profonde des Écritures. Tu es prêt à transmettre ce que tu as reçu.',
+    description: '« Comment prêcheront-ils, s\'ils ne sont pas envoyés ? » (Rm 10:14) — Tu as maîtrisé un thème en difficulté difficile. Tu es prêt à transmettre ce que tu as reçu.',
     icon: '🌟',
-    conditionType: 'complete_level',
-    conditionValue: 9,
+    conditionType: 'complete_difficulty',
+    conditionValue: 'difficile',
+  },
+  {
+    id: 'celui_qui_ecoute',
+    name: 'Celui qui écoute',
+    description: '« Prompt à écouter, lent à parler. » (Jc 1:19) — 25 parties jouées. Tu lis la Parole avec attention. La sagesse grandit en silence, avant de parler.',
+    icon: '👂',
+    conditionType: 'games_played',
+    conditionValue: 25,
   },
   {
     id: 'saint_des_saints',
     name: 'Saint des Saints',
-    description: '« Nous avons donc une pleine liberté d\'entrer dans le lieu très saint. » (Hé 10:19) — Tu as traversé tous les niveaux, humilié par la Parole à chaque étape. Gloire à Dieu seul.',
+    description: '« Nous avons donc une pleine liberté d\'entrer dans le lieu très saint. » (Hé 10:19) — Score parfait en difficulté difficile. Humilié par la Parole à chaque étape. Gloire à Dieu seul.',
     icon: '👑',
-    conditionType: 'complete_level',
-    conditionValue: 10,
+    conditionType: 'complete_all',
+    conditionValue: 1,
   },
 ]
 
 export function checkNewTrophies(
   trophiesAlreadyUnlocked: string[],
-  levelCompleted: number,
-  score: number,
+  themeCompleted: string,
+  difficulty: Difficulty,
+  pct: number,
   gamesPlayed: number,
   livesRemaining: number,
   maxLives: number
@@ -98,17 +83,24 @@ export function checkNewTrophies(
 
     let earned = false
     switch (trophy.conditionType) {
-      case 'complete_level':
-        earned = levelCompleted >= trophy.conditionValue
+      case 'complete_theme':
+        earned = !!themeCompleted
+        break
+      case 'complete_difficulty':
+        earned = difficulty === trophy.conditionValue
         break
       case 'perfect_score':
-        earned = score === 100
+        earned = pct === 100
         break
       case 'games_played':
-        earned = gamesPlayed >= trophy.conditionValue
+        earned = gamesPlayed >= (trophy.conditionValue as number)
         break
       case 'no_lives_lost':
         earned = livesRemaining === maxLives
+        break
+      case 'complete_all':
+        // À implémenter quand tous les thèmes sont disponibles
+        earned = false
         break
     }
 

@@ -17,13 +17,13 @@ export async function createUserProfile(
 ): Promise<void> {
   const ref = doc(db, 'users', uid)
   const existing = await getDoc(ref)
-  if (existing.exists()) return // Ne pas écraser un profil existant
+  if (existing.exists()) return
 
   await setDoc(ref, {
     ...data,
     createdAt: serverTimestamp(),
     totalScore: 0,
-    levelsCompleted: [],
+    themesCompleted: {},
     trophiesUnlocked: [],
     gamesPlayed: 0,
     bestScores: {},
@@ -45,8 +45,9 @@ export async function saveGameResult(uid: string, result: GameResult): Promise<v
   if (!snap.exists()) return
 
   const profile = snap.data() as Omit<UserProfile, 'uid'>
-  const currentBest = profile.bestScores?.[result.levelId] ?? 0
+  const currentBest = profile.bestScores?.[result.themeId]?.[result.difficulty] ?? 0
   const isNewBest = result.score > currentBest
+  const won = result.livesRemaining > 0
 
   const updates: Record<string, unknown> = {
     gamesPlayed: (profile.gamesPlayed ?? 0) + 1,
@@ -54,15 +55,17 @@ export async function saveGameResult(uid: string, result: GameResult): Promise<v
   }
 
   if (isNewBest) {
-    updates[`bestScores.${result.levelId}`] = result.score
+    updates[`bestScores.${result.themeId}.${result.difficulty}`] = result.score
   }
 
-  // Marquer le niveau comme complété si gagné
-  if (result.livesRemaining > 0 && !profile.levelsCompleted?.includes(result.levelId)) {
-    updates.levelsCompleted = arrayUnion(result.levelId)
+  // Marquer la difficulté comme complétée pour ce thème si gagné
+  if (won) {
+    const alreadyCompleted: string[] = profile.themesCompleted?.[result.themeId] ?? []
+    if (!alreadyCompleted.includes(result.difficulty)) {
+      updates[`themesCompleted.${result.themeId}`] = arrayUnion(result.difficulty)
+    }
   }
 
-  // Débloquer les nouveaux trophées
   if (result.newTrophies.length > 0) {
     updates.trophiesUnlocked = arrayUnion(...result.newTrophies)
   }

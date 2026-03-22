@@ -10,9 +10,9 @@ import { useAuth } from '@/contexts/AuthContext'
 import { saveGameResult, getUserProfile } from '@/lib/firestore'
 import { useGameResult } from '@/hooks/useGameResult'
 import { TROPHIES } from '@/data/trophies'
-import { getLevelById } from '@/data/levels'
+import { getThemeById } from '@/data/themes'
 import Button from '@/components/ui/Button'
-import type { UserProfile } from '@/types'
+import type { UserProfile, Difficulty } from '@/types'
 
 function ResultatContent() {
   const searchParams = useSearchParams()
@@ -22,7 +22,8 @@ function ResultatContent() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [saved, setSaved] = useState(false)
 
-  const levelId = parseInt(searchParams.get('level') ?? '1', 10)
+  const themeId = searchParams.get('theme') ?? 'evangile'
+  const difficulty = (searchParams.get('difficulte') ?? 'facile') as Difficulty
 
   useEffect(() => {
     if (user) getUserProfile(user.uid).then(setProfile)
@@ -39,17 +40,19 @@ function ResultatContent() {
     return (
       <div className="text-center">
         <p className="text-sepia mb-4">Aucune partie en cours.</p>
-        <Link href="/niveaux"><Button>Choisir un niveau</Button></Link>
+        <Link href="/niveaux"><Button>Choisir un thème</Button></Link>
       </div>
     )
   }
 
+  const theme = getThemeById(themeId)
   const pct = Math.round((result.correctAnswers / result.totalQuestions) * 100)
-  const won = session.status === 'completed'
-  const level = getLevelById(levelId)
 
-  void level
-  void won
+  const difficultyLabel: Record<Difficulty, string> = {
+    facile: 'Facile',
+    intermediaire: 'Intermédiaire',
+    difficile: 'Difficile',
+  }
 
   const emoji = pct === 100 ? '🌟' : pct >= 70 ? '✝️' : pct >= 50 ? '🕊️' : '🌱'
   const message = pct === 100
@@ -64,8 +67,11 @@ function ResultatContent() {
     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-sm w-full">
       <div className="text-6xl mb-4">{emoji}</div>
       <h1 className="font-serif text-2xl text-sepia mb-1">
-        {session.status === 'completed' ? 'Niveau terminé !' : 'Partie terminée'}
+        {session.status === 'completed' ? 'Thème accompli !' : 'Partie terminée'}
       </h1>
+      {theme && (
+        <p className="text-gold text-sm font-medium mb-1">{theme.name} · {difficultyLabel[difficulty]}</p>
+      )}
       <p className="text-sepia-muted text-sm mb-6 italic">{message}</p>
 
       <div className="bg-parchment-card border border-gold-subtle rounded-2xl p-5 mb-5 space-y-3">
@@ -139,11 +145,11 @@ function ResultatContent() {
       )}
 
       <div className="space-y-3">
-        <Button size="lg" className="w-full" onClick={() => { resetGame(); router.push(`/jeu/${levelId}`) }}>
-          Rejouer ce niveau
+        <Button size="lg" className="w-full" onClick={() => { resetGame(); router.push(`/jeu/${themeId}/${difficulty}`) }}>
+          Rejouer
         </Button>
         <Link href="/niveaux" onClick={resetGame}>
-          <Button variant="secondary" size="default" className="w-full">Choisir un autre niveau</Button>
+          <Button variant="secondary" size="default" className="w-full">Choisir un autre thème</Button>
         </Link>
       </div>
     </motion.div>

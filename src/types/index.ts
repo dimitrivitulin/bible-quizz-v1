@@ -7,43 +7,45 @@ export interface UserProfile {
   photoURL: string | null
   createdAt: Date
   totalScore: number
-  levelsCompleted: number[]
   trophiesUnlocked: string[]
   gamesPlayed: number
-  bestScores: Record<number, number> // levelId → bestScore
+  // Nouveau schéma thématique
+  themesCompleted: Record<string, Difficulty[]>       // { 'evangile': ['facile', 'intermediaire'] }
+  bestScores: Record<string, Record<string, number>>  // { 'evangile': { 'facile': 80 } }
+  // Anciens champs conservés pour compatibilité (non supprimés)
+  levelsCompleted?: number[]
 }
 
 // ─── Questions ────────────────────────────────────────────────────────────────
 
 export interface Question {
   id: string
-  level: number
+  themeId: string
+  difficulty: Difficulty
   question: string
-  options: [string, string, string, string] // toujours 4 choix
+  options: [string, string, string, string]
   correctIndex: 0 | 1 | 2 | 3
-  reference: string // ex: "Genèse 6:14"
+  reference: string
 }
 
-// ─── Niveaux ──────────────────────────────────────────────────────────────────
+// ─── Thèmes ───────────────────────────────────────────────────────────────────
 
-export type Difficulty = 'facile' | 'intermédiaire' | 'hardcore'
+export type Difficulty = 'facile' | 'intermediaire' | 'difficile'
 
-export interface Level {
-  id: number
+export interface Theme {
+  id: string
   name: string
   description: string
-  difficulty: Difficulty
-  lives: number
-  questionsPerSession: number
-  minScoreToUnlock: number // score requis au niveau précédent
-  color: string // classe Tailwind
   icon: string
+  color: string
+  lives: Record<Difficulty, number>
 }
 
 // ─── Trophées ─────────────────────────────────────────────────────────────────
 
 export type TrophyConditionType =
-  | 'complete_level'
+  | 'complete_theme'
+  | 'complete_difficulty'
   | 'perfect_score'
   | 'games_played'
   | 'no_lives_lost'
@@ -56,19 +58,20 @@ export interface Trophy {
   description: string
   icon: string
   conditionType: TrophyConditionType
-  conditionValue: number // niveau, nombre, etc.
+  conditionValue: number | string
 }
 
 // ─── Jeu ──────────────────────────────────────────────────────────────────────
 
 export interface GameSession {
-  levelId: number
+  themeId: string
+  difficulty: Difficulty
   questions: Question[]
   currentIndex: number
   score: number
   lives: number
-  streak: number       // bonnes réponses consécutives
-  maxStreak: number    // meilleure série de la partie
+  streak: number
+  maxStreak: number
   answers: (number | null)[]
   startedAt: Date
   finishedAt?: Date
@@ -76,7 +79,8 @@ export interface GameSession {
 }
 
 export interface GameResult {
-  levelId: number
+  themeId: string
+  difficulty: Difficulty
   score: number
   maxScore: number
   correctAnswers: number
