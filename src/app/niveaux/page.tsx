@@ -10,10 +10,10 @@ import { THEMES } from '@/data/themes'
 import Button from '@/components/ui/Button'
 import type { UserProfile, Difficulty } from '@/types'
 
-const DIFFICULTIES: { key: Difficulty; label: string }[] = [
-  { key: 'facile', label: 'Facile' },
-  { key: 'intermediaire', label: 'Intermédiaire' },
-  { key: 'difficile', label: 'Difficile' },
+const DIFFICULTIES: { key: Difficulty; label: string; lives: number }[] = [
+  { key: 'facile', label: 'Facile', lives: 5 },
+  { key: 'intermediaire', label: 'Intermédiaire', lives: 3 },
+  { key: 'difficile', label: 'Difficile', lives: 1 },
 ]
 
 export default function NiveauxPage() {
@@ -33,110 +33,161 @@ export default function NiveauxPage() {
     if (difficulty === 'facile') return true
     const completed = profile?.themesCompleted?.[themeId] ?? []
     if (difficulty === 'intermediaire') return completed.includes('facile')
-    if (difficulty === 'difficile') return completed.includes('intermediaire')
-    return false
+    return completed.includes('intermediaire')
   }
 
-  const isCompleted = (themeId: string, difficulty: Difficulty): boolean => {
-    const completed = profile?.themesCompleted?.[themeId] ?? []
-    return completed.includes(difficulty)
-  }
+  const isCompleted = (themeId: string, difficulty: Difficulty): boolean =>
+    (profile?.themesCompleted?.[themeId] ?? []).includes(difficulty)
 
-  const getBestScore = (themeId: string, difficulty: Difficulty): number | undefined => {
-    return profile?.bestScores?.[themeId]?.[difficulty]
-  }
+  const getBestScore = (themeId: string, difficulty: Difficulty): number | undefined =>
+    profile?.bestScores?.[themeId]?.[difficulty]
 
   if (loading || !user) return null
 
+  const firstName = user.displayName?.split(' ')[0] ?? 'Disciple'
+  const trophyCount = profile?.trophiesUnlocked?.length ?? 0
+
   return (
-    <main className="min-h-screen bg-parchment px-4 py-8">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="max-w-lg mx-auto mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h1 className="font-serif text-2xl text-sepia">Bonjour, {user.displayName?.split(' ')[0] ?? 'Disciple'}</h1>
-            <p className="text-sepia-subtle text-sm italic">Choisis ton thème et ta difficulté</p>
-          </div>
-          <Link href="/trophees">
-            <Button variant="outline" size="sm" className="border-gold-subtle text-sepia hover:bg-parchment-card">🏆</Button>
-          </Link>
-        </div>
+    <main className="min-h-screen bg-parchment">
 
-        {profile && (
-          <div className="bg-parchment-card border border-gold-subtle rounded-2xl px-4 py-3 flex items-center justify-between mt-3">
+      {/* Header sticky */}
+      <motion.header
+        initial={{ opacity: 0, y: -15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="sticky top-0 z-10 bg-parchment-card border-b border-[#C9A96E] shadow-sm px-4 py-3"
+      >
+        <div className="max-w-lg mx-auto">
+          <div className="flex items-start justify-between mb-2">
             <div>
-              <p className="text-xs text-sepia-subtle">Score total</p>
-              <p className="text-gold font-bold text-lg">{profile.totalScore} pts</p>
+              <p className="font-serif text-[18px] text-sepia font-semibold leading-tight">Bonjour, {firstName}</p>
+              <p className="text-[12px] text-sepia-subtle italic">Choisis ta thématique</p>
             </div>
-            <div className="text-center">
-              <p className="text-xs text-sepia-subtle">Parties</p>
-              <p className="text-sepia font-bold">{profile.gamesPlayed}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-sepia-subtle">Trophées</p>
-              <p className="text-sepia font-bold">{profile.trophiesUnlocked?.length ?? 0}</p>
-            </div>
+            <Link href="/trophees">
+              <Button variant="ghost" size="sm" className="relative text-sepia hover:bg-parchment">
+                🏆
+                {trophyCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#A0762A] text-[#F5EFE0] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                    {trophyCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
           </div>
-        )}
-      </motion.div>
 
-      <div className="max-w-lg mx-auto space-y-4">
+          {profile && (
+            <div className="bg-parchment rounded-xl px-4 py-2 flex items-center justify-between">
+              <div className="text-center">
+                <p className="text-[10px] text-sepia-subtle">Score total</p>
+                <p className="text-[16px] text-gold font-bold leading-tight">{profile.totalScore} pts</p>
+              </div>
+              <div className="w-px h-6 bg-[#C9A96E]" />
+              <div className="text-center">
+                <p className="text-[10px] text-sepia-subtle">Parties</p>
+                <p className="text-[16px] text-sepia font-bold leading-tight">{profile.gamesPlayed}</p>
+              </div>
+              <div className="w-px h-6 bg-[#C9A96E]" />
+              <div className="text-center">
+                <p className="text-[10px] text-sepia-subtle">Trophées</p>
+                <p className="text-[16px] text-sepia font-bold leading-tight">{trophyCount}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.header>
+
+      {/* Titre section */}
+      <div className="max-w-lg mx-auto px-4 pt-6 pb-2 text-center">
+        <p className="text-[#C9A96E] text-sm tracking-widest mb-1">─── ✦ ───</p>
+        <h1 className="font-serif text-[24px] text-sepia font-semibold">Thématiques</h1>
+        <p className="text-[11px] text-sepia-subtle italic mt-1">30 questions · 3 niveaux · Référence LS 1910</p>
+      </div>
+
+      {/* Cartes thèmes */}
+      <div className="max-w-lg mx-auto px-4 pb-8 space-y-4 mt-4">
         {THEMES.map((theme, i) => (
           <motion.div
             key={theme.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.06 }}
-            className="bg-parchment-card border border-gold-subtle rounded-2xl p-5"
+            transition={{ delay: i * 0.08 }}
+            whileHover={{ scale: 1.01 }}
+            className="bg-parchment-card border border-[#C9A96E] rounded-2xl overflow-hidden shadow-sm"
           >
-            <div className={`absolute top-0 left-0 h-1 w-full rounded-t-2xl bg-gradient-to-r ${theme.color}`} style={{ position: 'initial', height: 4, borderRadius: '12px 12px 0 0', background: `linear-gradient(to right, ${theme.color.includes('A0762A') ? '#A0762A' : '#4A6741'}, #C9A96E)` }} />
+            {/* Bande couleur top */}
+            <div className={`h-1 w-full bg-gradient-to-r ${theme.color}`} />
 
-            <div className="flex items-start gap-3 mb-4">
-              <span className="text-3xl">{theme.icon}</span>
-              <div>
-                <p className="font-serif text-sepia font-semibold text-lg">{theme.name}</p>
-                <p className="text-sepia-subtle text-xs mt-0.5">{theme.description}</p>
+            <div className="p-5">
+              {/* En-tête carte */}
+              <div className="flex items-start gap-3 mb-4">
+                <span className="text-[36px] leading-none mt-0.5">{theme.icon}</span>
+                <div className="min-w-0">
+                  <p className="font-serif text-[18px] text-sepia font-semibold leading-tight">{theme.name}</p>
+                  <p className="text-[11px] text-sepia-subtle mt-0.5 line-clamp-2">{theme.description}</p>
+                </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-3 gap-2">
-              {DIFFICULTIES.map(({ key, label }) => {
-                const unlocked = isUnlocked(theme.id, key)
-                const completed = isCompleted(theme.id, key)
-                const best = getBestScore(theme.id, key)
+              {/* Boutons difficulté */}
+              <div className="grid grid-cols-3 gap-2">
+                {DIFFICULTIES.map(({ key, label, lives }) => {
+                  const unlocked = isUnlocked(theme.id, key)
+                  const completed = isCompleted(theme.id, key)
+                  const best = getBestScore(theme.id, key)
 
-                if (!unlocked) {
+                  if (!unlocked) {
+                    return (
+                      <div key={key} className="rounded-xl border border-[#DDD0B0] bg-[#EDE4CC]/50 opacity-40 px-3 py-2.5 text-center min-h-[44px] flex flex-col items-center justify-center">
+                        <span className="text-[11px] text-sepia-subtle">🔒</span>
+                        <span className="text-[11px] text-sepia-subtle font-medium mt-0.5">{label}</span>
+                      </div>
+                    )
+                  }
+
                   return (
-                    <div key={key} className="rounded-xl border border-gold-subtle bg-parchment-muted opacity-40 px-3 py-2 text-center">
-                      <p className="text-sepia-subtle text-xs font-medium">🔒</p>
-                      <p className="text-sepia-subtle text-xs">{label}</p>
-                    </div>
+                    <Link key={key} href={`/jeu/${theme.id}/${key}`} className="block">
+                      <motion.div
+                        whileHover={{ borderColor: '#A0762A' }}
+                        className={`rounded-xl border px-3 py-2.5 text-center min-h-[44px] flex flex-col items-center justify-center transition-all cursor-pointer ${
+                          completed
+                            ? 'bg-[#E8F0E6] border-[#4A6741]'
+                            : 'bg-parchment border-[#C9A96E] hover:shadow-sm hover:bg-parchment'
+                        }`}
+                      >
+                        {completed && (
+                          <motion.span
+                            initial={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
+                            className="text-[10px] text-[#4A6741] font-bold leading-none"
+                          >
+                            ✓
+                          </motion.span>
+                        )}
+                        <span className="text-[12px] text-sepia font-medium leading-tight">{label}</span>
+                        <span className="text-[10px] text-sepia-subtle leading-none mt-0.5">🕊️ ×{lives}</span>
+                        {best !== undefined && (
+                          <span className="text-[10px] text-gold font-medium leading-none mt-0.5">{best} pts</span>
+                        )}
+                      </motion.div>
+                    </Link>
                   )
-                }
-
-                return (
-                  <Link key={key} href={`/jeu/${theme.id}/${key}`}>
-                    <div className={`rounded-xl border px-3 py-2 text-center transition-all cursor-pointer hover:shadow-sm ${
-                      completed
-                        ? 'bg-[#E8F0E6] border-[#4A6741]'
-                        : 'bg-parchment border-gold-subtle hover:border-[#A0762A] hover:bg-parchment-card'
-                    }`}>
-                      {completed && <p className="text-[#4A6741] text-xs">✓</p>}
-                      <p className="text-sepia text-xs font-medium">{label}</p>
-                      {best !== undefined && <p className="text-gold text-xs">{best}pts</p>}
-                    </div>
-                  </Link>
-                )
-              })}
+                })}
+              </div>
             </div>
           </motion.div>
         ))}
       </div>
 
-      <div className="max-w-lg mx-auto mt-8 text-center">
-        <Button variant="ghost" size="sm" className="text-sepia-subtle hover:text-sepia" onClick={() => { logout(); router.push('/') }}>
+      {/* Déconnexion */}
+      <div className="max-w-lg mx-auto px-4 pb-10 text-center">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-sepia-subtle hover:text-sepia text-[12px]"
+          onClick={() => { logout(); router.push('/') }}
+        >
           Se déconnecter
         </Button>
       </div>
+
     </main>
   )
 }
