@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronDown } from 'lucide-react'
 import { Cross, HeartHandshake, Flame, BookOpen, Sprout, type LucideIcon } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { getUserProfile } from '@/lib/firestore'
@@ -37,13 +38,21 @@ export default function NiveauxPage() {
   const { user, loading, logout } = useAuth()
   const router = useRouter()
   const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [howToOpen, setHowToOpen] = useState(false)
+  const profileLoaded = useRef(false)
 
   useEffect(() => {
     if (!loading && !user) router.push('/connexion')
   }, [user, loading, router])
 
   useEffect(() => {
-    if (user) getUserProfile(user.uid).then(setProfile)
+    if (user) getUserProfile(user.uid).then((p) => {
+      setProfile(p)
+      if (!profileLoaded.current) {
+        profileLoaded.current = true
+        setHowToOpen((p?.gamesPlayed ?? 0) === 0)
+      }
+    })
   }, [user])
 
   const isUnlocked = (themeId: string, difficulty: Difficulty): boolean => {
@@ -119,8 +128,47 @@ export default function NiveauxPage() {
         <p className="text-[11px] text-sepia-subtle italic mt-1">30 questions · 3 niveaux · Référence LS 1910</p>
       </div>
 
+      {/* Encart Comment jouer */}
+      <div className="max-w-lg mx-auto px-4 mb-2">
+        <button
+          onClick={() => setHowToOpen((o) => !o)}
+          className="w-full flex items-center justify-between bg-parchment-card border border-[#C9A96E] rounded-2xl px-4 py-3 text-left"
+        >
+          <span className="font-serif text-sepia text-[14px] font-medium">❓ Comment jouer ?</span>
+          <motion.span animate={{ rotate: howToOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+            <ChevronDown size={16} className="text-gold" />
+          </motion.span>
+        </button>
+        <AnimatePresence initial={false}>
+          {howToOpen && (
+            <motion.div
+              key="how-to"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-parchment-card border border-t-0 border-[#C9A96E] rounded-b-2xl px-4 py-4 space-y-2.5">
+                {[
+                  { icon: '📋', text: '10 questions tirées au sort dans chaque niveau' },
+                  { icon: '⏱️', text: '15 secondes par question — réponds vite !' },
+                  { icon: '🕊️', text: 'Perds une vie par mauvaise réponse — 0 vie = partie perdue' },
+                  { icon: '🔥', text: '3 bonnes réponses d\'affilée = ×2 points bonus' },
+                ].map(({ icon, text }) => (
+                  <div key={text} className="flex items-start gap-3">
+                    <span className="text-[16px] shrink-0 mt-0.5">{icon}</span>
+                    <p className="text-sepia-subtle text-[13px] leading-snug">{text}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       {/* Cartes thèmes */}
-      <div className="max-w-lg mx-auto px-4 pb-8 space-y-4 mt-4">
+      <div className="max-w-lg mx-auto px-4 pb-8 space-y-4 mt-2">
         {THEMES.map((theme, i) => (
           <motion.div
             key={theme.id}

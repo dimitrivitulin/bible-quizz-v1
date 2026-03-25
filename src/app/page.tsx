@@ -49,7 +49,7 @@ export default function HomePage() {
           transition={{ delay: 0.5 }}
           className="text-sepia-subtle text-sm mb-8 leading-relaxed"
         >
-          10 niveaux · 300+ questions · Louis Segond 1910<br />
+          5 thématiques · 3 niveaux · 450+ questions · Louis Segond 1910<br />
           Avance à ton rythme, dans l&apos;humilité du disciple.
         </motion.p>
 
