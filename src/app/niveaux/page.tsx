@@ -178,8 +178,16 @@ export default function NiveauxPage() {
             whileHover={{ scale: 1.01 }}
             className="bg-parchment-card border border-[#C9A96E] rounded-2xl overflow-hidden shadow-sm"
           >
-            {/* Bande couleur top */}
-            <div className={`h-1 w-full bg-gradient-to-r ${theme.color}`} />
+            {/* Illustration thème */}
+            <div className="relative h-36 w-full overflow-hidden">
+              <img
+                src={`/images/themes/${theme.id}.png`}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#2C1A0E]/50 to-transparent" />
+              <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${theme.color}`} />
+            </div>
 
             <div className="p-5">
               {/* En-tête carte */}
