@@ -4,11 +4,28 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { Cross, HeartHandshake, Flame, BookOpen, Sprout, type LucideIcon } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { getUserProfile } from '@/lib/firestore'
 import { THEMES } from '@/data/themes'
 import Button from '@/components/ui/Button'
 import type { UserProfile, Difficulty } from '@/types'
+
+const THEME_ICONS: Record<string, LucideIcon> = {
+  'evangile': Cross,
+  'salut': HeartHandshake,
+  'saint-esprit': Flame,
+  'priere': BookOpen,
+  'vie-chretienne': Sprout,
+}
+
+const THEME_ICON_COLORS: Record<string, string> = {
+  'evangile': '#A0762A',
+  'salut': '#4A6741',
+  'saint-esprit': '#C0522A',
+  'priere': '#5A4A8A',
+  'vie-chretienne': '#2A7A6A',
+}
 
 const DIFFICULTIES: { key: Difficulty; label: string; lives: number }[] = [
   { key: 'facile', label: 'Facile', lives: 5 },
@@ -119,7 +136,14 @@ export default function NiveauxPage() {
             <div className="p-5">
               {/* En-tête carte */}
               <div className="flex items-start gap-3 mb-4">
-                <span className="text-[36px] leading-none mt-0.5">{theme.icon}</span>
+                {(() => {
+                  const Icon = THEME_ICONS[theme.id]
+                  return Icon ? (
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${THEME_ICON_COLORS[theme.id]}18` }}>
+                      <Icon size={22} style={{ color: THEME_ICON_COLORS[theme.id] }} strokeWidth={1.8} />
+                    </div>
+                  ) : null
+                })()}
                 <div className="min-w-0">
                   <p className="font-serif text-[18px] text-sepia font-semibold leading-tight">{theme.name}</p>
                   <p className="text-[11px] text-sepia-subtle mt-0.5 line-clamp-2">{theme.description}</p>
@@ -135,9 +159,9 @@ export default function NiveauxPage() {
 
                   if (!unlocked) {
                     return (
-                      <div key={key} className="rounded-xl border border-[#DDD0B0] bg-[#EDE4CC]/50 opacity-40 px-3 py-2.5 text-center min-h-[44px] flex flex-col items-center justify-center">
-                        <span className="text-[11px] text-sepia-subtle">🔒</span>
-                        <span className="text-[11px] text-sepia-subtle font-medium mt-0.5">{label}</span>
+                      <div key={key} className="h-16 rounded-xl border border-[#DDD0B0] bg-[#EDE4CC]/50 opacity-40 px-2 flex flex-col items-center justify-center gap-0.5">
+                        <span className="text-[12px]">🔒</span>
+                        <span className="text-[11px] text-sepia-subtle font-medium">{label}</span>
                       </div>
                     )
                   }
@@ -145,26 +169,25 @@ export default function NiveauxPage() {
                   return (
                     <Link key={key} href={`/jeu/${theme.id}/${key}`} className="block">
                       <motion.div
-                        whileHover={{ borderColor: '#A0762A' }}
-                        className={`rounded-xl border px-3 py-2.5 text-center min-h-[44px] flex flex-col items-center justify-center transition-all cursor-pointer ${
+                        whileHover={{ borderColor: '#A0762A', scale: 1.02 }}
+                        transition={{ duration: 0.15 }}
+                        className={`h-16 rounded-xl border px-2 flex flex-col items-center justify-center gap-0.5 cursor-pointer transition-shadow ${
                           completed
                             ? 'bg-[#E8F0E6] border-[#4A6741]'
-                            : 'bg-parchment border-[#C9A96E] hover:shadow-sm hover:bg-parchment'
+                            : 'bg-parchment border-[#C9A96E] hover:shadow-sm'
                         }`}
                       >
-                        {completed && (
-                          <motion.span
-                            initial={{ scale: 0.9 }}
-                            animate={{ scale: 1 }}
-                            className="text-[10px] text-[#4A6741] font-bold leading-none"
-                          >
-                            ✓
-                          </motion.span>
-                        )}
-                        <span className="text-[12px] text-sepia font-medium leading-tight">{label}</span>
-                        <span className="text-[10px] text-sepia-subtle leading-none mt-0.5">🕊️ ×{lives}</span>
+                        {completed
+                          ? <span className="text-[11px] text-[#4A6741] font-bold leading-none">✓</span>
+                          : <span className="text-[11px] text-sepia-subtle leading-none">🕊️ ×{lives}</span>
+                        }
+                        <span className="text-[12px] text-sepia font-medium leading-none">{label}</span>
+                        {completed
+                          ? <span className="text-[10px] text-sepia-subtle leading-none">🕊️ ×{lives}</span>
+                          : null
+                        }
                         {best !== undefined && (
-                          <span className="text-[10px] text-gold font-medium leading-none mt-0.5">{best} pts</span>
+                          <span className="text-[10px] text-gold font-medium leading-none">{best} pts</span>
                         )}
                       </motion.div>
                     </Link>
