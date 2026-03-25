@@ -20,9 +20,13 @@ export default function HomePage() {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 150 }}
-          className="text-6xl mb-6"
+          className="mb-6"
         >
-          📖
+          <img
+            src="/images/hero.png"
+            alt=""
+            className="w-64 h-64 mx-auto rounded-2xl object-cover shadow-md"
+          />
         </motion.div>
 
         <motion.h1
@@ -49,8 +53,8 @@ export default function HomePage() {
           transition={{ delay: 0.5 }}
           className="text-sepia-subtle text-sm mb-8 leading-relaxed"
         >
-          5 thématiques · 3 niveaux · 450+ questions · Louis Segond 1910<br />
-          Avance à ton rythme, dans l&apos;humilité du disciple.
+          La Parole mérite d&apos;être connue.<br />
+          Pas seulement lue — connue.
         </motion.p>
 
         <motion.div
