@@ -1,6 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
+import { FlameSVG } from '@/components/ui/Icons'
 
 interface StreakIndicatorProps {
   streak: number
@@ -26,8 +27,8 @@ export default function StreakIndicator({ streak, lastPointsGained }: StreakIndi
               {streak > 0 ? `${streak}` : '0'}
             </motion.span>
           </AnimatePresence>
-          <span className={`text-lg ${streak > 0 ? 'opacity-100' : 'opacity-30'}`}>
-            🔥
+          <span className={`transition-opacity ${streak > 0 ? 'opacity-100' : 'opacity-25'}`}>
+            <FlameSVG size={20} filled={streak > 0} />
           </span>
         </div>
         <p className="text-[10px] text-sepia-subtle">streak</p>

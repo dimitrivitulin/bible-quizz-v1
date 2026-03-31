@@ -9,6 +9,7 @@ import Timer from './Timer'
 import LivesBar from './LivesBar'
 import QuestionCard from './QuestionCard'
 import StreakIndicator from './StreakIndicator'
+import { EtoileSVG, ColombeSVG } from '@/components/ui/Icons'
 import type { Difficulty } from '@/types'
 
 interface GameScreenProps {
@@ -189,7 +190,9 @@ export default function GameScreen({ themeId, difficulty }: GameScreenProps) {
               transition={{ type: 'spring', stiffness: 200 }}
               className="text-center bg-parchment-card border-2 border-[#A0762A] rounded-3xl px-10 py-8"
             >
-              <motion.p animate={{ rotate: [0, -10, 10, -5, 5, 0] }} transition={{ duration: 0.6, delay: 0.2 }} className="text-6xl mb-4">🌟</motion.p>
+              <motion.div animate={{ rotate: [0, -10, 10, -5, 5, 0] }} transition={{ duration: 0.6, delay: 0.2 }} className="mb-4 flex justify-center">
+                <EtoileSVG size={72} />
+              </motion.div>
               <p className="font-serif text-sepia text-3xl">Niveau accompli !</p>
               <p className="text-gold text-base mt-2 italic">Tu as grandi dans la Parole.</p>
             </motion.div>
@@ -211,7 +214,9 @@ export default function GameScreen({ themeId, difficulty }: GameScreenProps) {
               transition={{ type: 'spring', stiffness: 180 }}
               className="text-center bg-parchment-card border-2 border-[#7A2232] rounded-3xl px-10 py-8"
             >
-              <motion.p animate={{ y: [0, -10, 0] }} transition={{ duration: 0.5, repeat: 1 }} className="text-5xl mb-4">🕊️</motion.p>
+              <motion.div animate={{ y: [0, -10, 0] }} transition={{ duration: 0.5, repeat: 1 }} className="mb-4 flex justify-center">
+                <ColombeSVG size={64} filled={true} />
+              </motion.div>
               <p className="font-serif text-sepia text-2xl">Le chemin continue...</p>
               <p className="text-sepia-muted text-sm mt-2 italic">Même les apôtres ont raté.</p>
             </motion.div>

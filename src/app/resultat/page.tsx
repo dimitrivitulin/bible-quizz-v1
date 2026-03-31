@@ -12,6 +12,7 @@ import { useGameResult } from '@/hooks/useGameResult'
 import { TROPHIES } from '@/data/trophies'
 import { getThemeById } from '@/data/themes'
 import Button from '@/components/ui/Button'
+import { EtoileSVG, CroixSVG, ColombeSVG, GermeSVG } from '@/components/ui/Icons'
 import type { UserProfile, Difficulty } from '@/types'
 
 function ResultatContent() {
@@ -54,7 +55,7 @@ function ResultatContent() {
     difficile: 'Difficile',
   }
 
-  const emoji = pct === 100 ? '🌟' : pct >= 70 ? '✝️' : pct >= 50 ? '🕊️' : '🌱'
+  const ScoreIcon = pct === 100 ? EtoileSVG : pct >= 70 ? CroixSVG : pct >= 50 ? ColombeSVG : GermeSVG
   const message = pct === 100
     ? 'Score parfait ! Que la Parole soit célébrée.'
     : pct >= 70
@@ -65,7 +66,9 @@ function ResultatContent() {
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-sm w-full">
-      <div className="text-6xl mb-4">{emoji}</div>
+      <div className="mb-4 flex justify-center">
+        <ScoreIcon size={80} />
+      </div>
       <h1 className="font-serif text-2xl text-sepia mb-1">
         {session.status === 'completed' ? 'Thème accompli !' : 'Partie terminée'}
       </h1>
