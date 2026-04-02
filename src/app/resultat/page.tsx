@@ -12,7 +12,7 @@ import { useGameResult } from '@/hooks/useGameResult'
 import { TROPHIES } from '@/data/trophies'
 import { getThemeById } from '@/data/themes'
 import Button from '@/components/ui/Button'
-import { EtoileSVG, CroixSVG, ColombeSVG, GermeSVG } from '@/components/ui/Icons'
+import { ScoreIcon100, ScoreIcon70, ScoreIcon50, ScoreIcon0 } from '@/components/ui/Icons'
 import type { UserProfile, Difficulty } from '@/types'
 
 function ResultatContent() {
@@ -55,7 +55,7 @@ function ResultatContent() {
     difficile: 'Difficile',
   }
 
-  const ScoreIcon = pct === 100 ? EtoileSVG : pct >= 70 ? CroixSVG : pct >= 50 ? ColombeSVG : GermeSVG
+  const ScoreIcon = pct === 100 ? ScoreIcon100 : pct >= 70 ? ScoreIcon70 : pct >= 50 ? ScoreIcon50 : ScoreIcon0
   const message = pct === 100
     ? 'Score parfait ! Que la Parole soit célébrée.'
     : pct >= 70

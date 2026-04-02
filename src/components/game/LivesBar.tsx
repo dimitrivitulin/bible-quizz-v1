@@ -1,4 +1,4 @@
-import { ColombeSVG } from '@/components/ui/Icons'
+import { VieIcon } from '@/components/ui/Icons'
 
 interface LivesBarProps {
   lives: number
@@ -11,7 +11,7 @@ export default function LivesBar({ lives, maxLives }: LivesBarProps) {
       <div className="flex items-center gap-1.5" aria-label={`${lives} vie(s) restante(s) sur ${maxLives}`}>
         {Array.from({ length: maxLives }).map((_, i) => (
           <span key={i} className={`transition-all duration-300 ${i < lives ? 'opacity-100' : 'opacity-20'}`}>
-            <ColombeSVG size={22} filled={i < lives} />
+            <VieIcon active={i < lives} size={22} />
           </span>
         ))}
       </div>
